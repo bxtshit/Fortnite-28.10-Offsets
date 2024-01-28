@@ -1,0 +1,12 @@
+	Vector3 GetBoneWithRotation(uintptr_t mesh, int bone_id)
+	{
+		uintptr_t bone_array = request->read<uintptr_t>(mesh + Offsets::BoneArray);
+		if (bone_array == NULL)
+		{
+			bone_array = request->read<uintptr_t>(mesh + Offsets::BoneArray + 0x10);
+		}
+		ViewPoint::FTransform bone = request->read<ViewPoint::FTransform>(bone_array + (bone_id * 0x60));
+		ViewPoint::FTransform component_to_world = request->read<ViewPoint::FTransform>(mesh + 0x230);
+		D3DMATRIX matrix = ViewPoint::MatrixMultiplication(bone.ToMatrixWithScale(), component_to_world.ToMatrixWithScale());
+		return Vector3(matrix._41, matrix._42, matrix._43);
+	}
